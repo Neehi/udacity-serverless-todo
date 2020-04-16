@@ -31,6 +31,7 @@ functions:
           method: get
           path: todos
           cors: true
+          auth: Auth
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -45,6 +46,7 @@ functions:
           method: post
           path: todos
           cors: true
+          auth: Auth
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -59,6 +61,7 @@ functions:
           method: patch
           path: todos/{todoId}
           cors: true
+          auth: Auth
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -73,6 +76,7 @@ functions:
           method: delete
           path: todos/{todoId}
           cors: true
+          auth: Auth
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -87,6 +91,7 @@ functions:
           method: post
           path: todos/{todoId}/attachment
           cors: true
+          auth: Auth
 
 resources:
   Resources:
