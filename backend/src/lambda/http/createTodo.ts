@@ -5,9 +5,10 @@ import * as AWS  from 'aws-sdk'
 import * as uuid from 'uuid'
 
 import { CreateTodoRequest } from '../../requests/CreateTodoRequest'
+import { getUserId } from '../utils'
 
 const docClient = new AWS.DynamoDB.DocumentClient()
-  
+
 const todosTable = process.env.TODOS_TABLE
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -15,12 +16,12 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
 
   const newTodo: CreateTodoRequest = JSON.parse(event.body)
 
-  // TODO: Implement creating a new TODO item
+  const userId = getUserId(event)
   const todoId = uuid.v4()
   const timestamp = new Date().toISOString()
 
   const newItem = {
-    userId: 'TEST',  // FIXME: Update to use getUserId()
+    userId,
     createdAt: timestamp,
     todoId,
     done: false,
