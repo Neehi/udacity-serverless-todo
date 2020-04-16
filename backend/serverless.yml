@@ -15,6 +15,7 @@ provider:
   environment:
     TODOS_TABLE: Todos-${self:provider.stage}
     USERID_CREATEDAT_INDEX: UserIdCreatedAtIndex
+    ATTACHMENTS_S3_BUCKET: todos-attachments-${self:provider.stage}
 
 functions:
 
@@ -116,3 +117,36 @@ resources:
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
+
+    # S3 Bucket
+    AttachmentsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.ATTACHMENTS_S3_BUCKET}
+        CorsConfiguration:
+          CorsRules:
+            - AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+                - HEAD
+              MaxAge: 3000
+
+    AttachmentsBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        PolicyDocument:
+          Id: MyPolicy
+          Version: "2012-10-17"
+          Statement:
+            - Sid: PublicReadForGetBucketObjects
+              Effect: Allow
+              Principal: '*'
+              Action: 's3:GetObject'
+              Resource: 'arn:aws:s3:::${self:provider.environment.ATTACHMENTS_S3_BUCKET}/*'
+        Bucket: !Ref AttachmentsBucket
