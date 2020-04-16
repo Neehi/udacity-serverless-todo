@@ -16,6 +16,7 @@ provider:
     TODOS_TABLE: Todos-${self:provider.stage}
     USERID_CREATEDAT_INDEX: UserIdCreatedAtIndex
     ATTACHMENTS_S3_BUCKET: todos-attachments-${self:provider.stage}
+    SIGNED_URL_EXPIRATION: 300
 
 functions:
 
@@ -85,6 +86,7 @@ functions:
       - http:
           method: post
           path: todos/{todoId}/attachment
+          cors: true
 
 resources:
   Resources:
