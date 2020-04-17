@@ -7,6 +7,9 @@ import * as uuid from 'uuid'
 import { TodoItem } from '../models/TodoItem'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
+import { createLogger } from '../utils/logger'
+
+const logger = createLogger('todos')
 
 const docClient = new AWS.DynamoDB.DocumentClient()
 
@@ -20,7 +23,7 @@ const bucketName = process.env.ATTACHMENTS_S3_BUCKET
 const urlExpiration = process.env.SIGNED_URL_EXPIRATION
 
 export async function getTodos(userId: string): Promise<TodoItem[]> {
-  console.log(`Retrieving all todos for user ${userId}`)
+  logger.info(`Retrieving all todos for user ${userId}`, { userId })
 
   const result = await docClient.query({
     TableName: todosTable,
@@ -32,8 +35,6 @@ export async function getTodos(userId: string): Promise<TodoItem[]> {
   }).promise()
 
   const items = result.Items
-
-  console.log(`Retrieved ${items.length} todos`)
 
   return items as TodoItem[]
 }
@@ -50,20 +51,18 @@ export async function createTodo(userId: string, createTodoRequest: CreateTodoRe
     ...createTodoRequest
   }
 
-  console.log(`Creating todo ${todoId} for user ${userId} - ${JSON.stringify(newItem)}`)
+  logger.info(`Creating todo ${todoId} for user ${userId}`, { userId, todoId, todoItem: newItem })
 
   await docClient.put({
     TableName: todosTable,
     Item: newItem,
   }).promise()
 
-  console.log(`Created todo ${todoId}`)
-
   return newItem
 }
 
 export async function updateTodo(userId: string, todoId: string, updateTodoRequest: UpdateTodoRequest) {
-  console.log(`Updating todo ${todoId} for user ${userId} - ${JSON.stringify(updateTodoRequest)}`)
+  logger.info(`Updating todo ${todoId} for user ${userId}`, { userId, todoId, updateTodoRequest })
 
   await docClient.update({
     TableName: todosTable,
@@ -81,12 +80,10 @@ export async function updateTodo(userId: string, todoId: string, updateTodoReque
       ":done": updateTodoRequest.done
     }
   }).promise()
-
-  console.log(`Updated todo ${todoId}`)
 }
 
 export async function deleteTodo(userId: string, todoId: string) {
-  console.log(`Deleting todo ${todoId} for user ${userId}`)
+  logger.info(`Deleting todo ${todoId} for user ${userId}`, { userId, todoId })
 
   await docClient.delete({
     TableName: todosTable,
@@ -95,14 +92,12 @@ export async function deleteTodo(userId: string, todoId: string) {
       todoId
     }
   }).promise()
-
-  console.log(`Deleted todo ${todoId}`)
 }
 
 export async function updateAttachmentUrl(userId: string, todoId: string, attachmentId: string) {
   const attachmentUrl = `https://${bucketName}.s3.amazonaws.com/${attachmentId}`
 
-  console.log(`Updating todo ${todoId} with attachment URL ${attachmentUrl}`)
+  logger.info(`Updating todo ${todoId} with attachment URL ${attachmentUrl}`, { userId, todoId })
 
   await docClient.update({
     TableName: todosTable,
@@ -115,20 +110,16 @@ export async function updateAttachmentUrl(userId: string, todoId: string, attach
       ':attachmentUrl': attachmentUrl
     }
   }).promise();
-
-  console.log(`Updated todo ${todoId}`)
 }
 
 export async function generateUploadUrl(attachmentId: string): Promise<string> {
-  console.log(`Generating upload URL for attachment ${attachmentId}`)
+  logger.info(`Generating upload URL for attachment ${attachmentId}`)
 
   const uploadUrl = s3.getSignedUrl('putObject', {
     Bucket: bucketName,
     Key: attachmentId,
     Expires: urlExpiration
   })
-
-  console.log(`Generated upload URL ${uploadUrl}`)
 
   return uploadUrl
 }
