@@ -1,38 +1,18 @@
 import 'source-map-support/register'
 
 import { APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda'
-import * as AWS  from 'aws-sdk'
-import * as uuid from 'uuid'
 
+import { createTodo } from '../../businessLogic/todos'
 import { CreateTodoRequest } from '../../requests/CreateTodoRequest'
 import { getUserId } from '../utils'
-
-const docClient = new AWS.DynamoDB.DocumentClient()
-
-const todosTable = process.env.TODOS_TABLE
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   console.log('Processing event: ', event)
 
+  const userId = getUserId(event)
   const newTodo: CreateTodoRequest = JSON.parse(event.body)
 
-  const userId = getUserId(event)
-  const todoId = uuid.v4()
-  const timestamp = new Date().toISOString()
-
-  const newItem = {
-    userId,
-    createdAt: timestamp,
-    todoId,
-    done: false,
-    attachmentUrl: null,
-    ...newTodo
-  }
-
-  await docClient.put({
-    TableName: todosTable,
-    Item: newItem,
-  }).promise()
+  const newItem = await createTodo(userId, newTodo)
 
   return {
     statusCode: 201,
