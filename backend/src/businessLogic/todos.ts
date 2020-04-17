@@ -50,7 +50,7 @@ export async function createTodo(userId: string, createTodoRequest: CreateTodoRe
     ...createTodoRequest
   }
 
-  console.log(`Creating todo ${todoId} for user ${userId} - ${newItem}`)
+  console.log(`Creating todo ${todoId} for user ${userId} - ${JSON.stringify(newItem)}`)
 
   await docClient.put({
     TableName: todosTable,
@@ -63,7 +63,7 @@ export async function createTodo(userId: string, createTodoRequest: CreateTodoRe
 }
 
 export async function updateTodo(userId: string, todoId: string, updateTodoRequest: UpdateTodoRequest) {
-  console.log(`Updating todo ${todoId} for user ${userId} - ${updateTodoRequest}`)
+  console.log(`Updating todo ${todoId} for user ${userId} - ${JSON.stringify(updateTodoRequest)}`)
 
   await docClient.update({
     TableName: todosTable,
