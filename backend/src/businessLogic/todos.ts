@@ -54,3 +54,17 @@ export async function createTodo(userId: string, createTodoRequest: CreateTodoRe
 
   return newItem
 }
+
+export async function deleteTodo(userId: string, todoId: string) {
+  console.log(`Deleting todo ${todoId} for user ${userId}`)
+
+  await docClient.delete({
+    TableName: todosTable,
+    Key: {
+      userId,
+      todoId
+    }
+  }).promise()
+
+  console.log(`Deleted todo ${todoId}`)
+}
