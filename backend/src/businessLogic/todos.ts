@@ -6,6 +6,7 @@ import * as uuid from 'uuid'
 
 import { TodoItem } from '../models/TodoItem'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
+import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 
 const docClient = new AWS.DynamoDB.DocumentClient()
 
@@ -53,6 +54,29 @@ export async function createTodo(userId: string, createTodoRequest: CreateTodoRe
   console.log(`Created todo ${todoId}`)
 
   return newItem
+}
+
+export async function updateTodo(userId: string, todoId: string, updateTodoRequest: UpdateTodoRequest) {
+  console.log(`Updating todo ${todoId} for user ${userId} - ${updateTodoRequest}`)
+
+  await docClient.update({
+    TableName: todosTable,
+    Key: {
+      userId,
+      todoId
+    },
+    UpdateExpression: 'set #name = :name, dueDate = :dueDate, done = :done',
+    ExpressionAttributeNames: {
+      "#name": "name"
+    },
+    ExpressionAttributeValues: {
+      ":name": updateTodoRequest.name,
+      ":dueDate": updateTodoRequest.dueDate,
+      ":done": updateTodoRequest.done
+    }
+  }).promise()
+
+  console.log(`Updated todo ${todoId}`)
 }
 
 export async function deleteTodo(userId: string, todoId: string) {
