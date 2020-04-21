@@ -57,6 +57,8 @@ async function verifyToken(authHeader: string): Promise<JwtPayload> {
 
   const cert = await getCertificate()
 
+  logger.info(`Verifying token ${token}`)
+
   return verify(token, cert, { algorithms: ['RS256'] }) as JwtPayload
 }
 
@@ -75,18 +77,41 @@ function getToken(authHeader: string): string {
 async function getCertificate(): Promise<string> {
   if (cachedCertificate) return cachedCertificate
 
-  logger.info('Fetching certificate', jwksUrl)
+  logger.info(`Fetching certificate from ${jwksUrl}`)
 
   const response = await Axios.get(jwksUrl);
-  const key = response.data.keys[0]  // XXX: Handle multiple keys?
+  const keys = response.data.keys
 
-  if (!key || key.use !== 'sig' || key.kty !== 'RSA' || key.alg !== 'RS256' || !key.kid || !key.x5c || !key.x5c.length) {
-    throw new Error('Invalid certificate')
-  }
+  if (!keys || !keys.length)
+    throw new Error('No JWKS keys found')
 
-  cachedCertificate = `-----BEGIN CERTIFICATE-----\n${key.x5c[0]}\n-----END CERTIFICATE-----`;  
+  const signingKeys = keys.filter(
+    key => key.use === 'sig'
+           && key.kty === 'RSA'
+           && key.alg === 'RS256'
+           && key.n
+           && key.e
+           && key.kid
+           && (key.x5c && key.x5c.length)
+  )
+
+  if (!signingKeys.length)
+    throw new Error('No JWKS signing keys found')
+  
+  // XXX: Only handles single signing key
+  const key = signingKeys[0]
+  const pub = key.x5c[0]  // public key
+
+  // Certificate found!
+  cachedCertificate = certToPEM(pub);
 
   logger.info('Valid certificate found', cachedCertificate)
 
   return cachedCertificate
+}
+
+function certToPEM(cert: string): string {
+  cert = cert.match(/.{1,64}/g).join('\n')
+  cert = `-----BEGIN CERTIFICATE-----\n${cert}\n-----END CERTIFICATE-----\n`
+  return cert
 }
