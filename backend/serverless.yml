@@ -17,7 +17,7 @@ provider:
     USERID_CREATEDAT_INDEX: UserIdCreatedAtIndex
     ATTACHMENTS_S3_BUCKET: todos-attachments-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
-    AUTH_0_JWK_SURL: https://dev-cr9isr4f.eu.auth0.com/.well-known/jwks.json
+    AUTH_0_JWKS_URL: https://dev-cr9isr4f.eu.auth0.com/.well-known/jwks.json
 
 functions:
 
