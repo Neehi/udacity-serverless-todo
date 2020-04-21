@@ -16,15 +16,13 @@ Before getting started, make sure Node.js is downloaded and installed. The lates
 
 Serverless Framework is used to build and deploy the application. Instructions for installing Serverless Framework can be found [here](https://serverless.com/framework/docs/getting-started/).
 
-## Dependencies
+### Amazon Web Services (AWS)
 
-**Amazon Web Services (AWS)**
+An AWS account is required to deploy the application.
 
-An AWS account is required and will need setting up to deploy and run the application.
+### Auth0
 
-**Auth0**
-
-Auth0 is used for authentication and an account will need setting up and configuring for the application to run.
+Auth0 is used for authentication and an Auth0 application should be created with asymmetrically encrypted keys (RS256).
 
 ## Getting started
 
