@@ -52,13 +52,13 @@ export async function createTodo(userId: string, createTodoRequest: CreateTodoRe
 export async function updateTodo(userId: string, todoId: string, updateTodoRequest: UpdateTodoRequest) {
   logger.info(`Updating todo ${todoId} for user ${userId}`, { userId, todoId, todoUpdate: updateTodoRequest })
 
-  todosAccess.updateTodo(userId, todoId, updateTodoRequest as TodoUpdate)
+  todosAccess.updateTodo(todoId, updateTodoRequest as TodoUpdate)
 }
 
 export async function deleteTodo(userId: string, todoId: string) {
   logger.info(`Deleting todo ${todoId} for user ${userId}`, { userId, todoId })
 
-  todosAccess.deleteTodo(userId, todoId)
+  todosAccess.deleteTodo(todoId)
 }
 
 export async function updateAttachmentUrl(userId: string, todoId: string, attachmentId: string) {
@@ -66,7 +66,7 @@ export async function updateAttachmentUrl(userId: string, todoId: string, attach
 
   logger.info(`Updating todo ${todoId} with attachment URL ${attachmentUrl}`, { userId, todoId })
 
-  await todosAccess.updateAttachmentUrl(userId, todoId, attachmentUrl)
+  await todosAccess.updateAttachmentUrl(todoId, attachmentUrl)
 }
 
 export async function generateUploadUrl(attachmentId: string): Promise<string> {
