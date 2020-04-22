@@ -52,6 +52,16 @@ export async function createTodo(userId: string, createTodoRequest: CreateTodoRe
 export async function updateTodo(userId: string, todoId: string, updateTodoRequest: UpdateTodoRequest) {
   logger.info(`Updating todo ${todoId} for user ${userId}`, { userId, todoId, todoUpdate: updateTodoRequest })
 
+  const item = await todosAccess.getTodoItem(todoId)
+
+  if (!item)
+    throw new Error('Item not found')  // FIXME: 404?
+
+  if (item.userId !== userId) {
+    logger.error(`User ${userId} does not have permission to update todo ${todoId}`)
+    throw new Error('User is not authorized to update item')  // FIXME: 403?
+  }
+
   todosAccess.updateTodoItem(todoId, updateTodoRequest as TodoUpdate)
 }
 
