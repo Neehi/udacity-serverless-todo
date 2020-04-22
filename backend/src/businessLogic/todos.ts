@@ -4,7 +4,7 @@ import * as AWS from 'aws-sdk'
 import * as AWSXRay from "aws-xray-sdk";
 import * as uuid from 'uuid'
 
-import { TodosAccess } from '../dataLayer/todosAccess'
+import { TodosAccess } from '../dataLayer/TodosAccess'
 import { TodoItem } from '../models/TodoItem'
 import { TodoUpdate } from '../models/TodoUpdate'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
@@ -27,7 +27,7 @@ const todosAccess = new TodosAccess()
 export async function getTodos(userId: string): Promise<TodoItem[]> {
   logger.info(`Retrieving all todos for user ${userId}`, { userId })
 
-  return await todosAccess.getTodos(userId)
+  return await todosAccess.getTodoItems(userId)
 }
 
 export async function createTodo(userId: string, createTodoRequest: CreateTodoRequest): Promise<TodoItem> {
@@ -44,7 +44,7 @@ export async function createTodo(userId: string, createTodoRequest: CreateTodoRe
 
   logger.info(`Creating todo ${todoId} for user ${userId}`, { userId, todoId, todoItem: newItem })
 
-  await todosAccess.createTodo(newItem)
+  await todosAccess.createTodoItem(newItem)
 
   return newItem
 }
@@ -52,13 +52,13 @@ export async function createTodo(userId: string, createTodoRequest: CreateTodoRe
 export async function updateTodo(userId: string, todoId: string, updateTodoRequest: UpdateTodoRequest) {
   logger.info(`Updating todo ${todoId} for user ${userId}`, { userId, todoId, todoUpdate: updateTodoRequest })
 
-  todosAccess.updateTodo(todoId, updateTodoRequest as TodoUpdate)
+  todosAccess.updateTodoItem(todoId, updateTodoRequest as TodoUpdate)
 }
 
 export async function deleteTodo(userId: string, todoId: string) {
   logger.info(`Deleting todo ${todoId} for user ${userId}`, { userId, todoId })
 
-  todosAccess.deleteTodo(todoId)
+  todosAccess.deleteTodoItem(todoId)
 }
 
 export async function updateAttachmentUrl(userId: string, todoId: string, attachmentId: string) {

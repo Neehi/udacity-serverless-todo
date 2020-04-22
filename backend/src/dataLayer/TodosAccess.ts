@@ -17,7 +17,9 @@ export class TodosAccess {
     private readonly todosByUserIndex = process.env.TODOS_BY_USER_INDEX
   ) {}
 
-  async getTodos(userId: string): Promise<TodoItem[]> {
+  async getTodoItems(userId: string): Promise<TodoItem[]> {
+    console.log(`Getting all todos items for user ${userId} from ${this.todosTable}`)
+
     const result = await this.docClient.query({
       TableName: this.todosTable,
       IndexName: this.todosByUserIndex,
@@ -32,14 +34,18 @@ export class TodosAccess {
     return items as TodoItem[]
   }
 
-  async createTodo(todoItem: TodoItem) {
+  async createTodoItem(todoItem: TodoItem) {
+    console.log(`Putting todo item ${todoItem.todoId} into ${this.todosTable}`)
+
     await this.docClient.put({
       TableName: this.todosTable,
       Item: todoItem,
     }).promise()
   }
 
-  async updateTodo(todoId: string, todoUpdate: TodoUpdate) {
+  async updateTodoItem(todoId: string, todoUpdate: TodoUpdate) {
+    console.log(`Updating todo item ${todoId} in ${this.todosTable}`)
+
     await this.docClient.update({
       TableName: this.todosTable,
       Key: {
@@ -57,7 +63,9 @@ export class TodosAccess {
     }).promise()   
   }
 
-  async deleteTodo(todoId: string) {
+  async deleteTodoItem(todoId: string) {
+    console.log(`Deleting todo item ${todoId} from ${this.todosTable}`)
+
     await this.docClient.delete({
       TableName: this.todosTable,
       Key: {
@@ -67,6 +75,8 @@ export class TodosAccess {
   }
 
   async updateAttachmentUrl(todoId: string, attachmentUrl: string) {
+    console.log(`Updating attachment URL for todo ${todoId} in ${this.todosTable}`)
+
     await this.docClient.update({
       TableName: this.todosTable,
       Key: {
