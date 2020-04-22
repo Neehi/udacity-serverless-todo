@@ -14,7 +14,7 @@ provider:
 
   environment:
     TODOS_TABLE: Todos-${self:provider.stage}
-    USERID_CREATEDAT_INDEX: UserIdCreatedAtIndex
+    TODOS_BY_USER_INDEX: TodosByUserIndex
     ATTACHMENTS_S3_BUCKET: todos-attachments-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
     AUTH_0_JWKS_URL: https://dev-cr9isr4f.eu.auth0.com/.well-known/jwks.json
@@ -40,7 +40,7 @@ functions:
       - Effect: Allow
         Action:
           - dynamodb:Query
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.USERID_CREATEDAT_INDEX}
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.TODOS_BY_USER_INDEX}
       - Effect: Allow
         Action:
           - xray:GetSamplingRules
@@ -203,7 +203,7 @@ resources:
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:provider.environment.TODOS_TABLE}
         GlobalSecondaryIndexes:
-          - IndexName: ${self:provider.environment.USERID_CREATEDAT_INDEX}
+          - IndexName: ${self:provider.environment.TODOS_BY_USER_INDEX}
             KeySchema:
               - AttributeName: userId
                 KeyType: HASH
