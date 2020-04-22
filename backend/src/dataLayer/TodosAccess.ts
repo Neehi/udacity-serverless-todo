@@ -17,6 +17,11 @@ export class TodosAccess {
     private readonly todosByUserIndex = process.env.TODOS_BY_USER_INDEX
   ) {}
 
+  async todoItemExists(todoId: string): Promise<boolean> {
+    const item = await this.getTodoItem(todoId)
+    return !!item
+  }
+
   async getTodoItems(userId: string): Promise<TodoItem[]> {
     console.log(`Getting all todos items for user ${userId} from ${this.todosTable}`)
 
