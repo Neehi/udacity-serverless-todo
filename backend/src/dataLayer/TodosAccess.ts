@@ -6,6 +6,9 @@ import * as AWSXRay from "aws-xray-sdk";
 
 import { TodoItem } from '../models/TodoItem'
 import { TodoUpdate } from '../models/TodoUpdate'
+import { createLogger } from '../utils/logger'
+
+const logger = createLogger('todosAccess')
 
 const XAWS = AWSXRay.captureAWS(AWS);
 
@@ -23,7 +26,7 @@ export class TodosAccess {
   }
 
   async getTodoItems(userId: string): Promise<TodoItem[]> {
-    console.log(`Getting all todos items for user ${userId} from ${this.todosTable}`)
+    logger.info(`Getting all todos for user ${userId} from ${this.todosTable}`)
 
     const result = await this.docClient.query({
       TableName: this.todosTable,
@@ -36,11 +39,13 @@ export class TodosAccess {
 
     const items = result.Items
 
+    logger.info(`Found ${items.length} todos for user ${userId} in ${this.todosTable}`)
+
     return items as TodoItem[]
   }
 
   async getTodoItem(todoId: string): Promise<TodoItem> {
-    console.log(`Getting todo item ${todoId} from ${this.todosTable}`)
+    logger.info(`Getting todo ${todoId} from ${this.todosTable}`)
 
     const result = await this.docClient.get({
       TableName: this.todosTable,
@@ -55,7 +60,7 @@ export class TodosAccess {
   }
 
   async createTodoItem(todoItem: TodoItem) {
-    console.log(`Putting todo item ${todoItem.todoId} into ${this.todosTable}`)
+    logger.info(`Putting todo ${todoItem.todoId} into ${this.todosTable}`)
 
     await this.docClient.put({
       TableName: this.todosTable,
@@ -64,7 +69,7 @@ export class TodosAccess {
   }
 
   async updateTodoItem(todoId: string, todoUpdate: TodoUpdate) {
-    console.log(`Updating todo item ${todoId} in ${this.todosTable}`)
+    logger.info(`Updating todo item ${todoId} in ${this.todosTable}`)
 
     await this.docClient.update({
       TableName: this.todosTable,
@@ -84,7 +89,7 @@ export class TodosAccess {
   }
 
   async deleteTodoItem(todoId: string) {
-    console.log(`Deleting todo item ${todoId} from ${this.todosTable}`)
+    logger.info(`Deleting todo item ${todoId} from ${this.todosTable}`)
 
     await this.docClient.delete({
       TableName: this.todosTable,
@@ -95,7 +100,7 @@ export class TodosAccess {
   }
 
   async updateAttachmentUrl(todoId: string, attachmentUrl: string) {
-    console.log(`Updating attachment URL for todo ${todoId} in ${this.todosTable}`)
+    logger.info(`Updating attachment URL for todo ${todoId} in ${this.todosTable}`)
 
     await this.docClient.update({
       TableName: this.todosTable,
