@@ -1,10 +1,9 @@
 import 'source-map-support/register'
 
-import * as AWS from 'aws-sdk'
-import * as AWSXRay from "aws-xray-sdk";
 import * as uuid from 'uuid'
 
 import { TodosAccess } from '../dataLayer/TodosAccess'
+import { TodosStorage } from '../dataLayer/TodosStorage'
 import { TodoItem } from '../models/TodoItem'
 import { TodoUpdate } from '../models/TodoUpdate'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
@@ -13,16 +12,8 @@ import { createLogger } from '../utils/logger'
 
 const logger = createLogger('todos')
 
-const XAWS = AWSXRay.captureAWS(AWS);
-
-const s3 = new XAWS.S3({
-  signatureVersion: 'v4'
-})
-
-const bucketName = process.env.ATTACHMENTS_S3_BUCKET
-const urlExpiration = process.env.SIGNED_URL_EXPIRATION
-
 const todosAccess = new TodosAccess()
+const todosStorage = new TodosStorage()
 
 export async function getTodos(userId: string): Promise<TodoItem[]> {
   logger.info(`Retrieving all todos for user ${userId}`, { userId })
@@ -82,7 +73,9 @@ export async function deleteTodo(userId: string, todoId: string) {
 }
 
 export async function updateAttachmentUrl(userId: string, todoId: string, attachmentId: string) {
-  const attachmentUrl = `https://${bucketName}.s3.amazonaws.com/${attachmentId}`
+  logger.info(`Generating attachment URL for attachment ${attachmentId}`)
+
+  const attachmentUrl = await todosStorage.getAttachmentUrl(attachmentId)
 
   logger.info(`Updating todo ${todoId} with attachment URL ${attachmentUrl}`, { userId, todoId })
 
@@ -102,11 +95,7 @@ export async function updateAttachmentUrl(userId: string, todoId: string, attach
 export async function generateUploadUrl(attachmentId: string): Promise<string> {
   logger.info(`Generating upload URL for attachment ${attachmentId}`)
 
-  const uploadUrl = s3.getSignedUrl('putObject', {
-    Bucket: bucketName,
-    Key: attachmentId,
-    Expires: urlExpiration
-  })
+  const uploadUrl = await todosStorage.getUploadUrl(attachmentId)
 
   return uploadUrl
 }
