@@ -79,7 +79,7 @@ async function getCertificate(): Promise<string> {
 
   logger.info(`Fetching certificate from ${jwksUrl}`)
 
-  const response = await Axios.get(jwksUrl);
+  const response = await Axios.get(jwksUrl)
   const keys = response.data.keys
 
   if (!keys || !keys.length)
@@ -103,7 +103,7 @@ async function getCertificate(): Promise<string> {
   const pub = key.x5c[0]  // public key
 
   // Certificate found!
-  cachedCertificate = certToPEM(pub);
+  cachedCertificate = certToPEM(pub)
 
   logger.info('Valid certificate found', cachedCertificate)
 
