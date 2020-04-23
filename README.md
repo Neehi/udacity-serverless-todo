@@ -1,6 +1,6 @@
 # Serverless TODO
 
-A simple TODO application using AWS Lambda and Serverless framework.
+A simple TODO application using AWS Lambda and Serverless framework, for the final project of the Udacity Cloud Developer Nanodegree.
 
 ## Functionality of the application
 
