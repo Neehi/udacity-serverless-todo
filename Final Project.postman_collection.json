@@ -94,7 +94,7 @@
 							{
 								"key": "Authorization",
 								"type": "text",
-								"value": "Bearer {{authToken}}"
+								"value": "Bearer {{}}"
 							}
 						],
 						"body": {
